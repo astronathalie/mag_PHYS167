@@ -454,18 +454,18 @@
 
     <div class="slider-row">
       <div>
-        <label><span id="m1-label">Magnitude of star A</span>  ·  <span style="color:var(--gold)" id="m1-raw">1.00</span></label>
-        <input type="range" id="m1" min="-30" max="25" step="0.01" value="1">
+        <label><span id="m1-label">Magnitude of star A</span>  ·  <span style="color:var(--gold)" id="m1-raw">6.00</span></label>
+        <input type="range" id="m1" min="-30" max="25" step="0.01" value="6">
       </div>
-      <div class="value-display" id="m1-display">1.00</div>
+      <div class="value-display" id="m1-display">6.00</div>
     </div>
 
     <div class="slider-row">
       <div>
-        <label><span id="m2-label">Magnitude of star B</span>  ·  <span style="color:var(--purple)" id="m2-raw">6.00</span></label>
-        <input type="range" id="m2" min="-30" max="25" step="0.01" value="6">
+        <label><span id="m2-label">Magnitude of star B</span>  ·  <span style="color:var(--purple)" id="m2-raw">1.00</span></label>
+        <input type="range" id="m2" min="-30" max="25" step="0.01" value="1">
       </div>
-      <div class="value-display purple" id="m2-display">6.00</div>
+      <div class="value-display purple" id="m2-display">1.00</div>
     </div>
 
     <div class="preset-row" id="preset-row-apparent">
@@ -512,12 +512,12 @@
       <div class="star-container">
         <div class="star-label">Star A</div>
         <div class="star a" id="star-a"></div>
-        <div class="star-mag gold" id="star-a-mag">m = 1.00</div>
+        <div class="star-mag gold" id="star-a-mag">m = 6.00</div>
       </div>
       <div class="star-container">
         <div class="star-label">Star B</div>
         <div class="star b" id="star-b"></div>
-        <div class="star-mag purple" id="star-b-mag">m = 6.00</div>
+        <div class="star-mag purple" id="star-b-mag">m = 1.00</div>
       </div>
     </div>
   </div>
@@ -525,10 +525,10 @@
   <div class="result-card">
     <div class="result-label">Result</div>
     <div class="result-value">
-      <em>F<sub>A</sub> / F<sub>B</sub></em>  =  <span id="result-ratio">100.00</span>
+      <em>F<sub>B</sub> / F<sub>A</sub></em>  =  <span id="result-ratio">100.00</span>
     </div>
     <div class="result-interpretation" id="interpretation">
-      Star A is 100× brighter than Star B.
+      Star B is 100× brighter than Star A.
     </div>
     <div class="context-note" id="context-note"></div>
   </div>
@@ -668,12 +668,14 @@
     const equal = isAbsolute ? 'The two stars have identical intrinsic luminosity.' : 'The two stars have identical flux.';
     if (abs < 0.001) return equal;
     if (ratio > 1) {
-      if (ratio > 1e6) return `Star A is ${ratio.toExponential(2)}× ${brighter} than Star B.`;
-      return `Star A is ${ratio >= 10 ? ratio.toFixed(1) : ratio.toFixed(2)}× ${brighter} than Star B.`;
+      // B is brighter than A
+      if (ratio > 1e6) return `Star B is ${ratio.toExponential(2)}× ${brighter} than Star A.`;
+      return `Star B is ${ratio >= 10 ? ratio.toFixed(1) : ratio.toFixed(2)}× ${brighter} than Star A.`;
     } else {
+      // B is fainter than A
       const factor = 1 / ratio;
-      if (factor > 1e6) return `Star A is ${factor.toExponential(2)}× ${fainter} than Star B.`;
-      return `Star A is ${factor >= 10 ? factor.toFixed(1) : factor.toFixed(2)}× ${fainter} than Star B.`;
+      if (factor > 1e6) return `Star B is ${factor.toExponential(2)}× ${fainter} than Star A.`;
+      return `Star B is ${factor >= 10 ? factor.toFixed(1) : factor.toFixed(2)}× ${fainter} than Star A.`;
     }
   }
 
@@ -701,15 +703,15 @@
     const sym = isAbsolute ? 'M' : 'm';
     const fsym = isAbsolute ? 'L' : 'F';
 
-    renderTex('eq1', `${sym}_A - ${sym}_B = -2.5 \\, \\log_{10}\\!\\left(\\frac{${fsym}_A}{${fsym}_B}\\right)`);
-    renderTex('eq2', `\\Delta ${sym} = ${sym}_A - ${sym}_B = ${m1s} - ${m2s} = \\class{hl-gold}{${dms}}`);
-    renderTex('eq3', `\\frac{${fsym}_A}{${fsym}_B} = 10^{-\\Delta ${sym} / 2.5} = 10^{${exps}} = \\class{hl-purple}{${ratios}}`);
+    renderTex('eq1', `${sym}_B - ${sym}_A = -2.5 \\, \\log_{10}\\!\\left(\\frac{${fsym}_B}{${fsym}_A}\\right)`);
+    renderTex('eq2', `\\Delta ${sym} = ${sym}_B - ${sym}_A = ${m2s} - ${m1s} = \\class{hl-gold}{${dms}}`);
+    renderTex('eq3', `\\frac{${fsym}_B}{${fsym}_A} = 10^{-\\Delta ${sym} / 2.5} = 10^{${exps}} = \\class{hl-purple}{${ratios}}`);
   }
 
   function update() {
     const m1 = parseFloat(m1Slider.value);
     const m2 = parseFloat(m2Slider.value);
-    const dm = m1 - m2;
+    const dm = m2 - m1;
     const exp = -dm / 2.5;
     const ratio = Math.pow(10, exp);
 
@@ -743,16 +745,16 @@
       note.innerHTML = `<strong>Sun vs Sirius at the same distance.</strong> Place both at 10 pc and Sirius outshines the Sun by a factor of ~23. The Sun only appears brighter in our sky because of its extreme proximity.`;
       note.classList.add('show');
     } else if (isSunBetelgeuse) {
-      note.innerHTML = `<strong>Sun vs Betelgeuse.</strong> Betelgeuse is ~26,000× more luminous than the Sun. At 10 pc it would shine at m ≈ −5.5 — brighter than Venus at its peak.`;
+      note.innerHTML = `<strong>Sun vs Betelgeuse.</strong> In V-band, Betelgeuse is ~14,000× more luminous than the Sun. (Bolometrically, including its copious infrared emission, the ratio jumps to ~90,000× — red supergiants emit most of their energy in the IR.)`;
       note.classList.add('show');
     } else if (isSunDeneb) {
-      note.innerHTML = `<strong>Sun vs Deneb.</strong> Deneb is one of the most luminous stars known to the naked eye (~200,000× the Sun). Its distance (~800 pc) is what tames it down to m ≈ +1.25 from Earth.`;
+      note.innerHTML = `<strong>Sun vs Deneb.</strong> Deneb is ~66,000× more luminous than the Sun in V-band (~200,000× bolometrically — it's a blue supergiant with much of its output in the UV). Its distance of ~800 pc is what tames it down to m ≈ +1.25 from Earth.`;
       note.classList.add('show');
     } else if (isSunProxima) {
-      note.innerHTML = `<strong>Sun vs Proxima Centauri.</strong> Proxima is our nearest stellar neighbor, but it's a tiny red dwarf with only ~0.0017 L☉. Even though it's very close, it's far too faint to see unaided.`;
+      note.innerHTML = `<strong>Sun vs Proxima Centauri.</strong> Proxima is our nearest stellar neighbor, but it's a tiny red dwarf — only ~1/3000 as luminous as the Sun in V-band. Even at 1.3 pc it's invisible without a telescope.`;
       note.classList.add('show');
     } else if (isDenebProxima) {
-      note.innerHTML = `<strong>Luminosity extremes.</strong> Deneb is ~10⁸ times more luminous than Proxima Centauri. This is roughly the full dynamic range of stars across the H-R diagram.`;
+      note.innerHTML = `<strong>Luminosity extremes.</strong> Deneb is ~2 × 10⁸ times more luminous than Proxima Centauri in V-band — roughly the full dynamic range of stars across the H-R diagram.`;
       note.classList.add('show');
     } else {
       note.classList.remove('show');
@@ -844,7 +846,7 @@
 
     // Update result card flux symbol
     const rv = document.querySelector('.result-card .result-value');
-    rv.innerHTML = `<em>${fluxSym}<sub>A</sub> / ${fluxSym}<sub>B</sub></em>  =  <span id="result-ratio">100.00</span>`;
+    rv.innerHTML = `<em>${fluxSym}<sub>B</sub> / ${fluxSym}<sub>A</sub></em>  =  <span id="result-ratio">100.00</span>`;
 
     // Force re-render of equations (clear cached TeX)
     ['eq1', 'eq2', 'eq3'].forEach(id => {
