@@ -875,6 +875,8 @@
     btn.addEventListener('click', () => {
       m1Slider.value = btn.dataset.m1;
       m2Slider.value = btn.dataset.m2;
+      m1Slider.dispatchEvent(new Event('change', { bubbles: true }));
+      m2Slider.dispatchEvent(new Event('change', { bubbles: true }));
       update();
     });
   });
@@ -1072,6 +1074,9 @@
     btn.addEventListener('click', () => {
       absmagSlider.value = btn.dataset.absmag;
       distSlider.value = distToSlider(parseFloat(btn.dataset.d));
+      // Force visual thumb update — some browsers don't redraw sliders on programmatic .value assignment
+      absmagSlider.dispatchEvent(new Event('change', { bubbles: true }));
+      distSlider.dispatchEvent(new Event('change', { bubbles: true }));
       updateDM();
     });
   });
@@ -1080,6 +1085,7 @@
   document.querySelectorAll('.dm-preset-d').forEach(btn => {
     btn.addEventListener('click', () => {
       distSlider.value = distToSlider(parseFloat(btn.dataset.d));
+      distSlider.dispatchEvent(new Event('change', { bubbles: true }));
       updateDM();
     });
   });
