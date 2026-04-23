@@ -506,22 +506,6 @@
     </div>
   </div>
 
-  <div class="panel">
-    <div class="panel-label">◆ Visual</div>
-    <div class="visual-row">
-      <div class="star-container">
-        <div class="star-label">Star A</div>
-        <div class="star a" id="star-a"></div>
-        <div class="star-mag gold" id="star-a-mag">m = 6.00</div>
-      </div>
-      <div class="star-container">
-        <div class="star-label">Star B</div>
-        <div class="star b" id="star-b"></div>
-        <div class="star-mag purple" id="star-b-mag">m = 1.00</div>
-      </div>
-    </div>
-  </div>
-
   <div class="result-card">
     <div class="result-label">Result</div>
     <div class="result-value">
@@ -601,22 +585,6 @@
     <div class="math-block">
       <div class="step-label">Step 3 · Apparent magnitude</div>
       <div class="math-render" id="dm-eq3"></div>
-    </div>
-  </div>
-
-  <div class="panel">
-    <div class="panel-label">◆ Visual</div>
-    <div class="visual-row">
-      <div class="star-container">
-        <div class="star-label">At 10 pc (M)</div>
-        <div class="star a" id="star-abs"></div>
-        <div class="star-mag gold" id="star-abs-mag">M = +4.83</div>
-      </div>
-      <div class="star-container">
-        <div class="star-label">At current distance (m)</div>
-        <div class="star b" id="star-app"></div>
-        <div class="star-mag purple" id="star-app-mag">m = +4.83</div>
-      </div>
     </div>
   </div>
 
@@ -759,49 +727,6 @@
     } else {
       note.classList.remove('show');
     }
-
-    const starA = document.getElementById('star-a');
-    const starB = document.getElementById('star-b');
-
-    const sizeFromMag = (m) => {
-      // Anchor: m=1 -> ~95%, m=6 -> ~55%, m=10 -> ~30%, m=15 -> ~10%
-      // For m < 1, keep growing (capped so it doesn't spill out of container)
-      const size = 95 - (m - 1) * 7;
-      return Math.max(8, Math.min(140, size));
-    };
-    const opacityFromMag = (m) => {
-      // m=1 saturates at 1.0; stays saturated for brighter stars
-      const o = 1.05 - (m - 1) * 0.095;
-      return Math.max(0.08, Math.min(1, o));
-    };
-    // Halo grows strongly past m=1 so the Sun blazes vs Sirius
-    const haloFromMag = (m) => {
-      // m=15 -> tiny halo, m=6 -> modest, m=1 -> bright, m=-1.5 (Sirius) -> big, m=-27 (Sun) -> enormous
-      if (m >= 1) return Math.max(0.15, 1.0 - (m - 1) * 0.12);
-      // For m < 1, grow exponentially — each magnitude brighter ≈ 2.5× more halo
-      return Math.min(8, Math.pow(2.0, 1 - m));
-    };
-
-    const sA = sizeFromMag(m1);
-    const sB = sizeFromMag(m2);
-    const oA = opacityFromMag(m1);
-    const oB = opacityFromMag(m2);
-    const hA = haloFromMag(m1);
-    const hB = haloFromMag(m2);
-
-    starA.style.width = sA + '%';
-    starA.style.height = sA + '%';
-    starA.style.opacity = oA;
-    starA.style.boxShadow = `0 0 ${sA * 0.6 * hA}px rgba(232, 181, 92, ${Math.min(1, 0.6 * hA)}), 0 0 ${sA * 1.5 * hA}px rgba(245, 201, 122, ${Math.min(0.7, 0.25 * hA)})`;
-
-    starB.style.width = sB + '%';
-    starB.style.height = sB + '%';
-    starB.style.opacity = oB;
-    starB.style.boxShadow = `0 0 ${sB * 0.6 * hB}px rgba(163, 117, 255, ${Math.min(1, 0.6 * hB)}), 0 0 ${sB * 1.5 * hB}px rgba(163, 117, 255, ${Math.min(0.7, 0.25 * hB)})`;
-
-    const sym = isAbsolute ? 'M' : 'm';
-    document.getElementById('star-a-mag').textContent = `${sym} = ${m1.toFixed(2)}`;
-    document.getElementById('star-b-mag').textContent = `${sym} = ${m2.toFixed(2)}`;
   }
 
   let rafPending = false;
@@ -839,10 +764,6 @@
     document.getElementById('m2-label').textContent = absolute ? 'Absolute magnitude of star B' : 'Magnitude of star B';
 
     explainer.textContent = absolute ? 'Intrinsic brightness at 10 pc' : 'How they look from Earth';
-
-    // Update star labels
-    document.querySelector('#star-a').parentElement.querySelector('.star-label').textContent = absolute ? `Star A · ${symbol}` : 'Star A';
-    document.querySelector('#star-b').parentElement.querySelector('.star-label').textContent = absolute ? `Star B · ${symbol}` : 'Star B';
 
     // Update result card flux symbol
     const rv = document.querySelector('.result-card .result-value');
@@ -977,20 +898,6 @@
     }
   }
 
-  // Brightness scaling — reuse the same logic from part I
-  function dmSizeFromMag(m) {
-    const size = 95 - (m - 1) * 7;
-    return Math.max(8, Math.min(140, size));
-  }
-  function dmOpacityFromMag(m) {
-    const o = 1.05 - (m - 1) * 0.095;
-    return Math.max(0.08, Math.min(1, o));
-  }
-  function dmHaloFromMag(m) {
-    if (m >= 1) return Math.max(0.15, 1.0 - (m - 1) * 0.12);
-    return Math.min(8, Math.pow(2.0, 1 - m));
-  }
-
   async function renderDMEquations(M, mu, d, m) {
     const Ms = formatMag(M);
     const ms = formatMag(m);
@@ -1031,30 +938,6 @@
     } else {
       note.classList.remove('show');
     }
-
-    // Star visuals — left star shows M (at 10 pc), right star shows current m
-    const starAbs = document.getElementById('star-abs');
-    const starApp = document.getElementById('star-app');
-
-    const sAbs = dmSizeFromMag(M);
-    const sApp = dmSizeFromMag(m);
-    const oAbs = dmOpacityFromMag(M);
-    const oApp = dmOpacityFromMag(m);
-    const hAbs = dmHaloFromMag(M);
-    const hApp = dmHaloFromMag(m);
-
-    starAbs.style.width = sAbs + '%';
-    starAbs.style.height = sAbs + '%';
-    starAbs.style.opacity = oAbs;
-    starAbs.style.boxShadow = `0 0 ${sAbs * 0.6 * hAbs}px rgba(232, 181, 92, ${Math.min(1, 0.6 * hAbs)}), 0 0 ${sAbs * 1.5 * hAbs}px rgba(245, 201, 122, ${Math.min(0.7, 0.25 * hAbs)})`;
-
-    starApp.style.width = sApp + '%';
-    starApp.style.height = sApp + '%';
-    starApp.style.opacity = oApp;
-    starApp.style.boxShadow = `0 0 ${sApp * 0.6 * hApp}px rgba(163, 117, 255, ${Math.min(1, 0.6 * hApp)}), 0 0 ${sApp * 1.5 * hApp}px rgba(163, 117, 255, ${Math.min(0.7, 0.25 * hApp)})`;
-
-    document.getElementById('star-abs-mag').textContent = `M = ${formatMag(M)}`;
-    document.getElementById('star-app-mag').textContent = `m = ${formatMag(m)}`;
   }
 
   let dmRafPending = false;
